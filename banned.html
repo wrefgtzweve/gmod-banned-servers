@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facepunch Banned List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 12px 20px;
+            font-size: 1em;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: #1e1e2e;
+            color: #e0e0e0;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box:focus {
+            border-color: #8a92f2;
+        }
+
+        .search-box::placeholder {
+            color: #666;
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .error {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #1e1e2e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: #b0b0b0;
+            font-size: 0.9em;
+        }
+
+        .sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .section {
+            background: #1e1e2e;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+
+        .section-header {
+            background: #2d2d44;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-count {
+            background: rgba(0,0,0,0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+
+        .section-content {
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .item {
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            color: #d0d0d0;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-label {
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .empty {
+            color: #666;
+            font-style: italic;
+            padding: 10px 0;
+        }
+
+        .gm-tag {
+            background: #ffeaa7;
+            color: #d63031;
+        }
+
+        .host-tag {
+            background: #a4de6c;
+            color: #27ae60;
+        }
+
+        .ip-tag {
+            background: #74b9ff;
+            color: #0984e3;
+        }
+
+        .map-tag {
+            background: #fd79a8;
+            color: #e84393;
+        }
+
+        .desc-tag {
+            background: #fab1a0;
+            color: #d63031;
+        }
+
+        .name-tag {
+            background: #fdcb6e;
+            color: #e17055;
+        }
+
+        .new-tag {
+            background: #00d2d3;
+            color: #0a8080;
+            font-weight: bold;
+        }
+
+        .section-new {
+            border: 2px solid #00d2d3;
+            box-shadow: 0 4px 12px rgba(0, 210, 211, 0.2);
+        }
+
+        .section-new .section-header {
+            background: linear-gradient(135deg, #2d2d44 0%, #00d2d3 100%);
+            color: white;
+        }
+
+        .new-item {
+            background: rgba(0, 210, 211, 0.1);
+            border-left: 3px solid #00d2d3;
+            margin-left: -15px;
+            margin-right: -15px;
+            padding-left: 12px;
+            padding-right: 15px;
+        }
+
+        .clickable-ip {
+            cursor: pointer;
+            text-decoration: underline;
+            transition: opacity 0.2s;
+        }
+
+        .clickable-ip:hover {
+            opacity: 0.8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e1e2e;
+            margin: auto;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: #667eea;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+        }
+
+        .server-info-section {
+            margin-bottom: 20px;
+        }
+
+        .server-info-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .server-info-item {
+            background: #252535;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .server-info-label {
+            color: #999;
+            font-size: 0.85em;
+            text-transform: uppercase;
+        }
+
+        .server-info-value {
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #333;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #ff6b6b;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .players-list {
+            background: #252535;
+            border-radius: 6px;
+            padding: 10px;
+        }
+
+        .player-item {
+            padding: 8px;
+            border-bottom: 1px solid #333;
+            color: #d0d0d0;
+            font-size: 0.9em;
+        }
+
+        .player-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .sections {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚫 Facepunch Banned List</h1>
+        
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-box" placeholder="Search bans... (maps, gamemodes, IPs, etc)">
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <p>Fetching banned list...</p>
+        </div>
+
+        <div id="content" style="display: block;">
+            <div class="stats" id="stats"></div>
+            <div class="sections" id="sections"></div>
+        </div>
+
+        <div id="error" style="display: none;" class="error"></div>
+    </div>
+
+    <!-- DATA_INJECTION_POINT -->
+
+    <script>
+        const API_URL = '/api/banned';
+        let allCategories = null;
+        let originalBanned = null;
+        let newBansSet = new Set();
+
+        function initializeFromData() {
+            try {
+                if (!window.__BAN_DATA__) {
+                    throw new Error('No ban data found');
+                }
+                
+                const data = window.__BAN_DATA__;
+                
+                if (!data.banned) {
+                    throw new Error('No banned data found in response');
+                }
+
+                originalBanned = data.banned;
+                newBansSet = new Set(data.new || []);
+                allCategories = categorizeBanned(originalBanned, Array.from(newBansSet));
+                
+                displayStats(allCategories);
+                displaySections(allCategories);
+                
+                // Setup search
+                setupSearch();
+                
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `<strong>Error:</strong> ${error.message}`;
+            }
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+                
+                if (query === '') {
+                    // Show all
+                    displayStats(allCategories);
+                    displaySections(allCategories);
+                } else {
+                    // Filter and display
+                    const filtered = filterCategories(allCategories, query);
+                    displayStats(filtered);
+                    displaySections(filtered);
+                }
+            });
+        }
+
+        function filterCategories(categories, query) {
+            const filtered = {};
+            
+            Object.keys(categories).forEach(key => {
+                filtered[key] = categories[key].filter(item => 
+                    item.toLowerCase().includes(query)
+                );
+            });
+            
+            return filtered;
+        }
+
+        function categorizeBanned(banned, newBans = []) {
+            const categories = {
+                newThisWeek: [],
+                maps: [],
+                gamemodes: [],
+                hosts: [],
+                ips: [],
+                descriptions: [],
+                names: [],
+                other: []
+            };
+
+            const newBansSet = new Set(newBans);
+
+            banned.forEach(item => {
+                // Check if this is a new item
+                if (newBansSet.has(item)) {
+                    categories.newThisWeek.push(item);
+                } else if (item.startsWith('map:')) {
+                    categories.maps.push(item.substring(4));
+                } else if (item.startsWith('gm:')) {
+                    categories.gamemodes.push(item.substring(3));
+                } else if (item.startsWith('host:')) {
+                    categories.hosts.push(item.substring(5));
+                } else if (item.startsWith('desc:')) {
+                    categories.descriptions.push(item.substring(5));
+                } else if (item.startsWith('name:')) {
+                    categories.names.push(item.substring(5));
+                } else if (item.startsWith('hos2t:')) {
+                    categories.hosts.push(item.substring(6));
+                } else if (item.includes('/')) {
+                    // CIDR notation
+                    categories.ips.push(item);
+                } else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(item)) {
+                    // Single IP
+                    categories.ips.push(item);
+                } else if (item.includes(':') && !item.startsWith('t')) {
+                    // IP:port format
+                    categories.ips.push(item);
+                } else if (item.startsWith('t') && item.includes('.')) {
+                    // Prefixed IP
+                    categories.ips.push(item);
+                } else if (/^rp_|^ze_|^zs_|^gm_|^map_|^tb_|^sky_|^cs_|^dm_|^deathmatch_/.test(item)) {
+                    // Map-like names (common Garry's Mod map prefixes)
+                    categories.maps.push(item);
+                } else {
+                    categories.other.push(item);
+                }
+            });
+
+            // Sort each category alphabetically
+            Object.keys(categories).forEach(key => {
+                categories[key].sort();
+            });
+
+            return categories;
+        }
+
+        function displayStats(categories) {
+            const statsHtml = `
+                <div class="stat-card">
+                    <h3>${categories.newThisWeek.length}</h3>
+                    <p>New This Week</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${categories.maps.length}</h3>
+                    <p>Banned Maps</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${categories.gamemodes.length}</h3>
+                    <p>Banned Gamemodes</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${categories.hosts.length}</h3>
+                    <p>Banned Hosts</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${categories.ips.length}</h3>
+                    <p>Banned IPs/Networks</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${categories.descriptions.length}</h3>
+                    <p>Banned Descriptions</p>
+                </div>
+                <div class="stat-card">
+                    <h3>${categories.other.length}</h3>
+                    <p>Other Bans</p>
+                </div>
+            `;
+            document.getElementById('stats').innerHTML = statsHtml;
+        }
+
+        function displaySections(categories, newBans = []) {
+            let html = '';
+
+            // New This Week - displayed first with special styling
+            if (categories.newThisWeek.length > 0) {
+                html += createSection('⭐ New This Week', categories.newThisWeek, 'new-tag', true);
+            }
+
+            // Maps
+            if (categories.maps.length > 0) {
+                html += createSection('🗺️ Banned Maps', categories.maps, 'map-tag');
+            }
+
+            // Gamemodes
+            if (categories.gamemodes.length > 0) {
+                html += createSection('🎮 Banned Gamemodes', categories.gamemodes, 'gm-tag');
+            }
+
+            // Hosts
+            if (categories.hosts.length > 0) {
+                html += createSection('🖥️ Banned Hosts', categories.hosts, 'host-tag');
+            }
+
+            // IPs
+            if (categories.ips.length > 0) {
+                html += createSection('🌐 Banned IPs/Networks', categories.ips, 'ip-tag');
+            }
+
+            // Descriptions
+            if (categories.descriptions.length > 0) {
+                html += createSection('📝 Banned Descriptions', categories.descriptions, 'desc-tag');
+            }
+
+            // Names
+            if (categories.names.length > 0) {
+                html += createSection('🏷️ Banned Names', categories.names, 'name-tag');
+            }
+
+            // Other
+            if (categories.other.length > 0) {
+                html += createSection('❓ Other Bans', categories.other, '');
+            }
+
+            document.getElementById('sections').innerHTML = html;
+        }
+
+        function createSection(title, items, tagClass, isNew = false) {
+            const itemsHtml = items.map(item => 
+                `<div class="item ${isNew ? 'new-item' : ''}"><span class="item-label ${tagClass}">•</span>${item}</div>`
+            ).join('');
+
+            return `
+                <div class="section ${isNew ? 'section-new' : ''}">
+                    <div class="section-header">
+                        <span>${title}</span>
+                        <span class="section-count">${items.length}</span>
+                    </div>
+                    <div class="section-content">
+                        ${itemsHtml || '<div class="empty">No items</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize on page load
+        initializeFromData();
+    </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.env.local
+.bans-cache.db
+.html-cache.json
+.DS_Store
+.vscode
+.idea
