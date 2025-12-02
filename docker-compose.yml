@@ -10,6 +10,7 @@ services:
       - ./banned.html:/app/banned.html
       - ./server.js:/app/server.js
       - ./bans-data:/app/data
+      - ./cache:/app/cache
     environment:
       - NODE_ENV=production
     restart: unless-stopped

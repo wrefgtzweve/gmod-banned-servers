@@ -11,8 +11,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = 3000;
-const DB_FILE = path.join(__dirname, '.bans-cache.db');
-const HTML_CACHE_FILE = path.join(__dirname, '.html-cache.json');
+const CACHE_DIR = path.join(__dirname, 'cache');
+const DB_FILE = path.join(CACHE_DIR, 'bans-cache.db');
+const HTML_CACHE_FILE = path.join(CACHE_DIR, 'html-cache.json');
 const API_KEY = 'RWsOQQrO860EaGY3qPsSsBQSev3gNO0KrcF3kv4Rl5frjE9OuUKQgAsRutxMZ4aU';
 const FACEPUNCH_API = `https://api.facepunch.com/api/public/manifest?public_key=${API_KEY}`;
 const HTML_TEMPLATE = fs.readFileSync(path.join(__dirname, 'banned.html'), 'utf-8');
@@ -24,6 +25,9 @@ let lastFetchTime = 0;
 
 // Initialize database
 function initDatabase() {
+    if (!fs.existsSync(CACHE_DIR)) {
+        fs.mkdirSync(CACHE_DIR, { recursive: true });
+    }
     const db = new Database(DB_FILE);
     db.exec(`
         CREATE TABLE IF NOT EXISTS bans (
