@@ -4,10 +4,6 @@ FROM node:22-alpine
 # Set working directory
 WORKDIR /app
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
-
 # Copy package files
 COPY package*.json ./
 
@@ -18,12 +14,6 @@ RUN npm install --omit=dev && \
 # Copy application files
 COPY server.js .
 COPY banned.html .
-
-# Change ownership to nodejs user
-RUN chown -R nodejs:nodejs /app
-
-# Switch to non-root user
-USER nodejs
 
 # Expose port
 EXPOSE 3000
