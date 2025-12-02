@@ -96,19 +96,6 @@ function generateBanHash(banData) {
     return crypto.createHash('md5').update(JSON.stringify(banData)).digest('hex');
 }
 
-// Load HTML cache from file
-function loadHtmlCache() {
-    try {
-        if (fs.existsSync(HTML_CACHE_FILE)) {
-            const cache = JSON.parse(fs.readFileSync(HTML_CACHE_FILE, 'utf-8'));
-            return cache;
-        }
-    } catch (error) {
-        console.error('Error loading HTML cache:', error);
-    }
-    return null;
-}
-
 // Save HTML cache to file
 function saveHtmlCache(html, banHash) {
     try {
@@ -130,14 +117,14 @@ async function backgroundFetch() {
         const now = Date.now();
         const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
         
+        const newEntries = identifyNewEntries(currentBanned, oldCache, isFirst);
+        
         currentBanned.forEach(item => {
             if (!oldCache[item]) {
                 const timestamp = isFirst ? oneWeekAgo - 1000 : now;
                 upsertEntry(item, timestamp);
             }
         });
-        
-        const newEntries = identifyNewEntries(currentBanned, oldCache, isFirst);
         
         const banData = {
             banned: currentBanned,
