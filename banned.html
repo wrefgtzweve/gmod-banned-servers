@@ -450,7 +450,6 @@
                 displayStats(allCategories);
                 displaySections(allCategories);
                 
-                // Setup search
                 setupSearch();
                 
                 document.getElementById('loading').style.display = 'none';
@@ -469,11 +468,9 @@
                 const query = e.target.value.toLowerCase().trim();
                 
                 if (query === '') {
-                    // Show all
                     displayStats(allCategories);
                     displaySections(allCategories);
                 } else {
-                    // Filter and display
                     const filtered = filterCategories(allCategories, query);
                     displayStats(filtered);
                     displaySections(filtered);
@@ -508,7 +505,6 @@
             const newBansSet = new Set(newBans);
 
             banned.forEach(item => {
-                // Check if this is a new item
                 if (newBansSet.has(item)) {
                     categories.newThisWeek.push(item);
                 } else if (item.startsWith('map:')) {
@@ -524,19 +520,14 @@
                 } else if (item.startsWith('hos2t:')) {
                     categories.hosts.push(item.substring(6));
                 } else if (item.includes('/')) {
-                    // CIDR notation
                     categories.ips.push(item);
                 } else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(item)) {
-                    // Single IP
                     categories.ips.push(item);
                 } else if (item.includes(':') && !item.startsWith('t')) {
-                    // IP:port format
                     categories.ips.push(item);
                 } else if (item.startsWith('t') && item.includes('.')) {
-                    // Prefixed IP
                     categories.ips.push(item);
                 } else if (/^rp_|^ze_|^zs_|^gm_|^map_|^tb_|^sky_|^cs_|^dm_|^deathmatch_/.test(item)) {
-                    // Map-like names (common Garry's Mod map prefixes)
                     categories.maps.push(item);
                 } else {
                     categories.other.push(item);
@@ -588,42 +579,34 @@
         function displaySections(categories, newBans = []) {
             let html = '';
 
-            // New This Week - displayed first with special styling
             if (categories.newThisWeek.length > 0) {
                 html += createSection('⭐ New This Week', categories.newThisWeek, 'new-tag', true);
             }
 
-            // Maps
             if (categories.maps.length > 0) {
                 html += createSection('🗺️ Banned Maps', categories.maps, 'map-tag');
             }
 
-            // Gamemodes
             if (categories.gamemodes.length > 0) {
                 html += createSection('🎮 Banned Gamemodes', categories.gamemodes, 'gm-tag');
             }
 
-            // Hosts
             if (categories.hosts.length > 0) {
                 html += createSection('🖥️ Banned Hosts', categories.hosts, 'host-tag');
             }
 
-            // IPs
             if (categories.ips.length > 0) {
                 html += createSection('🌐 Banned IPs/Networks', categories.ips, 'ip-tag');
             }
 
-            // Descriptions
             if (categories.descriptions.length > 0) {
                 html += createSection('📝 Banned Descriptions', categories.descriptions, 'desc-tag');
             }
 
-            // Names
             if (categories.names.length > 0) {
                 html += createSection('🏷️ Banned Names', categories.names, 'name-tag');
             }
 
-            // Other
             if (categories.other.length > 0) {
                 html += createSection('❓ Other Bans', categories.other, '');
             }
