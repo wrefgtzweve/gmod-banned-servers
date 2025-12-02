@@ -159,7 +159,7 @@ async function backgroundFetch() {
             cachedHtml = html;
             cachedBanHash = banHash;
             saveHtmlCache(html, banHash);
-            console.log(`[${new Date().toISOString()}] Ban data updated, ${currentBanned.length} bans, ${newEntries.length} new`);
+            console.log(`[${new Date().toISOString()}] Ban data updated, ${currentBanned.length} bans, ${Object.keys(newEntries).length} new`);
         }
     } catch (error) {
         console.error('Error in background fetch:', error);
