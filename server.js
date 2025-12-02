@@ -16,15 +16,15 @@ const HTML_CACHE_FILE = path.join(__dirname, '.html-cache.json');
 const API_KEY = 'RWsOQQrO860EaGY3qPsSsBQSev3gNO0KrcF3kv4Rl5frjE9OuUKQgAsRutxMZ4aU';
 const FACEPUNCH_API = `https://api.facepunch.com/api/public/manifest?public_key=${API_KEY}`;
 const HTML_TEMPLATE = fs.readFileSync(path.join(__dirname, 'banned.html'), 'utf-8');
+const REFRESH_INTERVAL = 60 * 60 * 1000;
 
 let cachedHtml = null;
 let cachedBanHash = null;
+let lastFetchTime = 0;
 
 // Initialize database
 function initDatabase() {
     const db = new Database(DB_FILE);
-    
-    // Create table if it doesn't exist
     db.exec(`
         CREATE TABLE IF NOT EXISTS bans (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,7 +33,6 @@ function initDatabase() {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     `);
-    
     return db;
 }
 
@@ -50,7 +49,7 @@ function getCachedEntries() {
     return entries;
 }
 
-// Check if this is the first cache (no entries)
+// Check if this is the first cache
 function isFirstCache() {
     const stmt = db.prepare('SELECT COUNT(*) as count FROM bans');
     const result = stmt.get();
@@ -73,17 +72,14 @@ function identifyNewEntries(currentBanned, oldCache, isFirst = false) {
     const now = Date.now();
     const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
     
-    // Skip new entry detection on first cache
     if (isFirst) {
         return newEntries;
     }
     
     currentBanned.forEach(item => {
         if (!oldCache[item]) {
-            // New entry not in cache
             newEntries[item] = now;
         } else if (oldCache[item] > oneWeekAgo) {
-            // Existing entry that was added within last week
             newEntries[item] = oldCache[item];
         }
     });
@@ -118,86 +114,74 @@ function saveHtmlCache(html, banHash) {
     }
 }
 
-// Fetch and cache bans
-async function fetchAndCacheBans() {
+// Background fetch function
+async function backgroundFetch() {
     try {
         const response = await fetch(FACEPUNCH_API);
         const data = await response.json();
         const currentBanned = data.Servers?.Banned || [];
         
-        // Load old cache
         const oldCache = getCachedEntries();
-        
-        // Check if this is the first cache
         const isFirst = isFirstCache();
-        
-        // Update database with current entries FIRST
         const now = Date.now();
         const oneWeekAgo = now - (7 * 24 * 60 * 60 * 1000);
         
         currentBanned.forEach(item => {
             if (!oldCache[item]) {
-                // For first cache, set all entries to old timestamp so they don't show as new
                 const timestamp = isFirst ? oneWeekAgo - 1000 : now;
                 upsertEntry(item, timestamp);
             }
         });
         
-        // Now identify new entries AFTER database is updated
         const newEntries = identifyNewEntries(currentBanned, oldCache, isFirst);
         
-        return {
+        const banData = {
             banned: currentBanned,
             new: Object.keys(newEntries),
             cacheTimestamp: Object.keys(oldCache).length > 0 ? Math.min(...Object.values(oldCache)) : 0,
             fetchTimestamp: now
         };
+        
+        lastFetchTime = now;
+        
+        const banHash = generateBanHash(banData);
+        if (cachedBanHash !== banHash) {
+            const html = HTML_TEMPLATE.replace(
+                '<!-- DATA_INJECTION_POINT -->',
+                `<script>
+                    window.__BAN_DATA__ = ${JSON.stringify(banData)};
+                </script>`
+            );
+            cachedHtml = html;
+            cachedBanHash = banHash;
+            saveHtmlCache(html, banHash);
+            console.log(`[${new Date().toISOString()}] Ban data updated, ${currentBanned.length} bans, ${newEntries.length} new`);
+        }
     } catch (error) {
-        console.error('Error fetching bans:', error);
-        return {
-            banned: [],
-            new: [],
-            cacheTimestamp: 0,
-            fetchTimestamp: Date.now(),
-            error: error.message
-        };
+        console.error('Error in background fetch:', error);
     }
 }
 
-app.use(express.static(__dirname, { index: false }));
+// Start background refresh on server startup
+async function startBackgroundRefresh() {
+    console.log('Starting background ban data refresh...');
+    await backgroundFetch();
+    setInterval(backgroundFetch, REFRESH_INTERVAL);
+}
 
-app.get('/', async (req, res) => {
-    try {
-        const banData = await fetchAndCacheBans();
-        const banHash = generateBanHash(banData);
-        
-        // Check if we have a cached HTML with the same ban data hash
-        const htmlCache = loadHtmlCache();
-        if (htmlCache && htmlCache.banHash === banHash) {
-            res.set('Content-Type', 'text/html; charset=utf-8');
-            res.set('X-Cache', 'HIT');
-            return res.send(htmlCache.html);
-        }
-        
-        // Generate new HTML
-        const html = HTML_TEMPLATE.replace(
-            '<!-- DATA_INJECTION_POINT -->',
-            `<script>
-                window.__BAN_DATA__ = ${JSON.stringify(banData)};
-            </script>`
-        );
-        
-        // Save to cache
-        saveHtmlCache(html, banHash);
-        
-        res.set('Content-Type', 'text/html; charset=utf-8');
-        res.set('X-Cache', 'MISS');
-        res.send(html);
-    } catch (error) {
-        res.status(500).send('Error fetching ban data');
+app.get('/', (req, res) => {
+    if (!cachedHtml) {
+        res.status(503).send('Ban data not yet loaded, please try again in a moment');
+        return;
     }
+    
+    res.set('Content-Type', 'text/html; charset=utf-8');
+    res.set('X-Cache', 'HIT');
+    res.set('X-Last-Update', new Date(lastFetchTime).toISOString());
+    res.send(cachedHtml);
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server running at http://localhost:${PORT}`);
+    await startBackgroundRefresh();
 });
