@@ -119,12 +119,19 @@ async function backgroundFetch() {
         
         const newEntries = identifyNewEntries(currentBanned, oldCache, isFirst);
         
-        currentBanned.forEach(item => {
-            if (!oldCache[item]) {
-                const timestamp = isFirst ? oneWeekAgo - 1000 : now;
-                upsertEntry(item, timestamp);
-            }
-        });
+        // Batch insert new entries using a transaction for better performance
+        if (currentBanned.length > 0) {
+            const insert = db.prepare('INSERT INTO bans (entry, timestamp) VALUES (?, ?) ON CONFLICT(entry) DO UPDATE SET timestamp = excluded.timestamp');
+            const insertMany = db.transaction((items) => {
+                items.forEach(item => {
+                    if (!oldCache[item]) {
+                        const timestamp = isFirst ? oneWeekAgo - 1000 : now;
+                        insert.run(item, timestamp);
+                    }
+                });
+            });
+            insertMany(currentBanned);
+        }
         
         const banData = {
             banned: currentBanned,
