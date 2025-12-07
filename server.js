@@ -13,14 +13,13 @@ const app = express();
 const PORT = 3000;
 const CACHE_DIR = path.join(__dirname, 'cache');
 const DB_FILE = path.join(CACHE_DIR, 'bans-cache.db');
-const HTML_CACHE_FILE = path.join(CACHE_DIR, 'html-cache.json');
+const BAN_DATA_FILE = path.join(CACHE_DIR, 'ban-data.json');
 const API_KEY = 'RWsOQQrO860EaGY3qPsSsBQSev3gNO0KrcF3kv4Rl5frjE9OuUKQgAsRutxMZ4aU';
 const FACEPUNCH_API = `https://api.facepunch.com/api/public/manifest?public_key=${API_KEY}`;
 const HTML_TEMPLATE = fs.readFileSync(path.join(__dirname, 'banned.html'), 'utf-8');
 const REFRESH_INTERVAL = 60 * 60 * 1000;
 
-let cachedHtml = null;
-let cachedBanHash = null;
+let cachedBanData = null;
 let lastFetchTime = 0;
 
 // Initialize database
@@ -96,12 +95,12 @@ function generateBanHash(banData) {
     return crypto.createHash('md5').update(JSON.stringify(banData)).digest('hex');
 }
 
-// Save HTML cache to file
-function saveHtmlCache(html, banHash) {
+// Save ban data to file
+function saveBanData(banData) {
     try {
-        fs.writeFileSync(HTML_CACHE_FILE, JSON.stringify({ html, banHash }, null, 2));
+        fs.writeFileSync(BAN_DATA_FILE, JSON.stringify(banData, null, 2));
     } catch (error) {
-        console.error('Error saving HTML cache:', error);
+        console.error('Error saving ban data cache:', error);
     }
 }
 
@@ -142,17 +141,8 @@ async function backgroundFetch() {
         
         lastFetchTime = now;
         
-        const banHash = generateBanHash(banData);
-        if (cachedBanHash !== banHash) {
-            const html = HTML_TEMPLATE.replace(
-                '<!-- DATA_INJECTION_POINT -->',
-                `<script>
-                    window.__BAN_DATA__ = ${JSON.stringify(banData)};
-                </script>`
-            );
-            cachedHtml = html;
-            cachedBanHash = banHash;
-            saveHtmlCache(html, banHash);
+        if (JSON.stringify(cachedBanData) !== JSON.stringify(banData)) {
+            cachedBanData = banData;
             console.log(`[${new Date().toISOString()}] Ban data updated, ${currentBanned.length} bans, ${Object.keys(newEntries).length} new`);
         }
     } catch (error) {
@@ -168,15 +158,21 @@ async function startBackgroundRefresh() {
 }
 
 app.get('/', (req, res) => {
-    if (!cachedHtml) {
+    if (!cachedBanData) {
         res.status(503).send('Ban data not yet loaded, please try again in a moment');
         return;
     }
     
+    const html = HTML_TEMPLATE.replace(
+        '<!-- DATA_INJECTION_POINT -->',
+        `<script>
+            window.__BAN_DATA__ = ${JSON.stringify(cachedBanData)};
+        </script>`
+    );
+    
     res.set('Content-Type', 'text/html; charset=utf-8');
-    res.set('X-Cache', 'HIT');
     res.set('X-Last-Update', new Date(lastFetchTime).toISOString());
-    res.send(cachedHtml);
+    res.send(html);
 });
 
 app.listen(PORT, async () => {

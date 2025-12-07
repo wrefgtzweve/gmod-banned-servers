@@ -1,0 +1,6 @@
+{
+  "watch": ["server.js", "banned.html"],
+  "ignore": ["cache/*", "node_modules/*"],
+  "ext": "js,html",
+  "exec": "node server.js"
+}
