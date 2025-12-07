@@ -13,7 +13,6 @@ const app = express();
 const PORT = 3000;
 const CACHE_DIR = path.join(__dirname, 'cache');
 const DB_FILE = path.join(CACHE_DIR, 'bans-cache.db');
-const BAN_DATA_FILE = path.join(CACHE_DIR, 'ban-data.json');
 const API_KEY = 'RWsOQQrO860EaGY3qPsSsBQSev3gNO0KrcF3kv4Rl5frjE9OuUKQgAsRutxMZ4aU';
 const FACEPUNCH_API = `https://api.facepunch.com/api/public/manifest?public_key=${API_KEY}`;
 const HTML_TEMPLATE = fs.readFileSync(path.join(__dirname, 'banned.html'), 'utf-8');
@@ -59,16 +58,6 @@ function isFirstCache() {
     return result.count === 0;
 }
 
-// Add or update an entry in cache
-function upsertEntry(entry, timestamp) {
-    const stmt = db.prepare(`
-        INSERT INTO bans (entry, timestamp) 
-        VALUES (?, ?) 
-        ON CONFLICT(entry) DO UPDATE SET timestamp = excluded.timestamp
-    `);
-    stmt.run(entry, timestamp);
-}
-
 // Identify new entries by comparing with cache
 function identifyNewEntries(currentBanned, oldCache, isFirst = false) {
     const newEntries = {};
@@ -88,20 +77,6 @@ function identifyNewEntries(currentBanned, oldCache, isFirst = false) {
     });
     
     return newEntries;
-}
-
-// Generate a simple hash of ban data for cache comparison
-function generateBanHash(banData) {
-    return crypto.createHash('md5').update(JSON.stringify(banData)).digest('hex');
-}
-
-// Save ban data to file
-function saveBanData(banData) {
-    try {
-        fs.writeFileSync(BAN_DATA_FILE, JSON.stringify(banData, null, 2));
-    } catch (error) {
-        console.error('Error saving ban data cache:', error);
-    }
 }
 
 // Background fetch function
