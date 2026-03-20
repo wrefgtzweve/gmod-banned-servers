@@ -6,464 +6,337 @@
     <title>Garry's Mod Banned List - Server Bans</title>
     <meta name="description" content="View the complete Garry's Mod banned list. Search and filter banned maps, gamemodes, IPs, hosts, and more. Stay updated with new bans.">
     <meta name="keywords" content="Garry's Mod, banned, servers, maps, gamemodes, blacklist">
-    <meta name="theme-color" content="#667eea">
-    
+    <meta name="theme-color" content="#000000">
+
     <!-- Open Graph / Discord Embed -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://https://bannedgmodservers.redox.to/">
+    <meta property="og:url" content="https://bannedgmodservers.redox.to/">
     <meta property="og:title" content="Garry's Mod Banned List">
     <meta property="og:description" content="View all Garry's Mod banned servers, maps, gamemodes, and IPs. Search and filter bans in real-time.">
-    <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><rect fill='%23667eea' width='1200' height='630'/><text x='50%' y='50%' font-size='72' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>🚫 Garry's Mod Banned List</text></svg>">
-    
+    <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><rect fill='%23000000' width='1200' height='630'/><text x='50%' y='50%' font-size='72' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>Garry's Mod Banned List</text></svg>">
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Garry's Mod Banned List">
     <meta name="twitter:description" content="View all Garry's Mod banned servers, maps, gamemodes, and IPs.">
-    <meta name="twitter:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><rect fill='%23667eea' width='1200' height='630'/><text x='50%' y='50%' font-size='72' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>🚫 Garry's Mod Banned List</text></svg>">
-    
+    <meta name="twitter:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'><rect fill='%23000000' width='1200' height='630'/><text x='50%' y='50%' font-size='72' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'>Garry's Mod Banned List</text></svg>">
+
     <!-- Additional SEO -->
     <meta name="author" content="Redox">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
     <meta name="revisit-after" content="1 hour">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        /* ── Reset & Base ── */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #1a1a2e;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 5px;
-            transition: background 0.3s;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #8a92f2;
-        }
-
-        /* Firefox Scrollbar */
-        * {
-            scrollbar-color: #667eea #1a1a2e;
-            scrollbar-width: thin;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
+        * { scrollbar-color: #333 transparent; scrollbar-width: thin; }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0a;
             min-height: 100vh;
-            padding: 20px;
-            color: #e0e0e0;
+            color: #ffffff;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            font-size: 14px;
+            line-height: 1.5;
         }
-        .container {
-            max-width: 1200px;
+
+        /* ── Layout ── */
+        .page-wrapper {
+            max-width: 1280px;
             margin: 0 auto;
+            padding: 0 24px 60px;
         }
 
-        h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 20px;
-            font-size: 2.5em;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .search-container {
+        /* ── Header ── */
+        .site-header {
             display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+            border-bottom: 1px solid #1a1a1a;
+            margin-bottom: 32px;
+            gap: 16px;
+        }
+
+        .site-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ffffff;
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+        }
+
+        .site-title span {
+            color: #888;
+            font-weight: 400;
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 0 1 320px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #555;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
         }
 
         .search-box {
             width: 100%;
-            max-width: 500px;
-            padding: 12px 20px;
-            font-size: 1em;
-            border: 2px solid #667eea;
-            border-radius: 8px;
-            background: #1e1e2e;
-            color: #e0e0e0;
+            padding: 8px 12px 8px 34px;
+            font-size: 13px;
+            font-family: inherit;
+            border: 1px solid #222;
+            border-radius: 6px;
+            background: #111;
+            color: #fff;
             outline: none;
-            transition: border-color 0.3s;
+            transition: border-color 0.15s;
         }
 
-        .search-box:focus {
-            border-color: #8a92f2;
-        }
+        .search-box:focus { border-color: #444; }
+        .search-box::placeholder { color: #555; }
 
-        .search-box::placeholder {
-            color: #666;
-        }
-
-        .loading {
-            text-align: center;
-            color: white;
-            font-size: 1.2em;
-        }
-
-        .error {
-            background: #ff6b6b;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
+        /* ── Stats Row ── */
         .stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 32px;
         }
 
         .stat-card {
-            background: #1e1e2e;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            background: #111;
+            border: 1px solid #1f1f1f;
+            border-radius: 6px;
+            padding: 18px 20px;
+        }
+
+        .stat-card .stat-num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        /* ── Error / Loading ── */
+        .loading {
             text-align: center;
-            border: 1px solid #333;
+            color: #888;
+            padding: 60px 0;
+            font-size: 14px;
         }
 
-        .stat-card h3 {
-            color: #667eea;
-            font-size: 2em;
-            margin-bottom: 5px;
+        .error {
+            background: #1a0000;
+            border: 1px solid #3f0000;
+            color: #ff8080;
+            padding: 14px 16px;
+            border-radius: 6px;
+            margin: 20px 0;
+            font-size: 13px;
         }
 
-        .stat-card p {
-            color: #b0b0b0;
-            font-size: 0.9em;
-        }
-
+        /* ── Section Grid ── */
         .sections {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
         }
 
+        @media (max-width: 1024px) {
+            .sections { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 640px) {
+            .sections { grid-template-columns: 1fr; }
+            .site-header { flex-direction: column; align-items: flex-start; }
+            .search-wrap { flex: 0 1 100%; width: 100%; }
+        }
+
+        /* ── Category Card ── */
         .section {
-            background: #1e1e2e;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            background: #111;
+            border: 1px solid #1f1f1f;
+            border-radius: 6px;
             overflow: hidden;
-            border: 1px solid #333;
-        }
-
-        .section-header {
-            background: #2d2d44;
-            color: white;
-            padding: 15px;
-            font-weight: bold;
-            font-size: 1.1em;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .section-count {
-            background: rgba(0,0,0,0.2);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.9em;
-        }
-
-        .section-content {
-            padding: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-            background: #181825;
-        }
-
-        .item {
-            padding: 10px 12px;
-            border-bottom: 1px solid #333;
-            word-break: break-all;
-            font-family: 'Fira Code', 'JetBrains Mono', 'Courier New', monospace;
-            font-size: 0.9em;
-            color: #d0d0d0;
-            border-radius: 4px;
-            margin-bottom: 4px;
-            background: rgba(102, 126, 234, 0.05);
-            cursor: text;
-            user-select: all;
-            -webkit-user-select: all;
-            transition: background 0.2s;
-        }
-
-        .item:hover {
-            background: rgba(102, 126, 234, 0.12);
-        }
-
-        .item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-
-        .item-label {
-            color: #667eea;
-            font-weight: bold;
-            margin-right: 5px;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .empty {
-            color: #666;
-            font-style: italic;
-            padding: 10px 0;
-        }
-
-        .gm-tag {
-            background: #ffeaa7;
-            color: #d63031;
-        }
-
-        .host-tag {
-            background: #a4de6c;
-            color: #27ae60;
-        }
-
-        .ip-tag {
-            background: #74b9ff;
-            color: #0984e3;
-        }
-
-        .map-tag {
-            background: #fd79a8;
-            color: #e84393;
-        }
-
-        .desc-tag {
-            background: #fab1a0;
-            color: #d63031;
-        }
-
-        .name-tag {
-            background: #fdcb6e;
-            color: #e17055;
-        }
-
-        .new-tag {
-            background: #00d2d3;
-            color: #0a8080;
-            font-weight: bold;
+            flex-direction: column;
         }
 
         .section-new {
-            border: 2px solid #00d2d3;
-            box-shadow: 0 4px 12px rgba(0, 210, 211, 0.2);
+            border-color: #2a2a2a;
         }
 
-        .section-new .section-header {
-            background: linear-gradient(135deg, #2d2d44 0%, #00d2d3 100%);
-            color: white;
-        }
-
-        .new-item {
-            background: rgba(0, 210, 211, 0.1);
-            border-left: 3px solid #00d2d3;
-            margin-left: -15px;
-            margin-right: -15px;
-            padding-left: 12px;
-            padding-right: 15px;
-        }
-
-        .clickable-ip {
-            color: #4da6ff;
-            text-decoration: none;
-            cursor: pointer;
-            transition: color 0.2s, text-shadow 0.2s;
-            font-weight: 500;
-        }
-
-        .clickable-ip:hover {
-            color: #74d9ff;
-            text-shadow: 0 0 8px rgba(74, 166, 255, 0.5);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal.show {
+        .section-header {
             display: flex;
-        }
-
-        .modal-content {
-            background: #1e1e2e;
-            margin: auto;
-            padding: 30px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #333;
-            padding-bottom: 15px;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid #1a1a1a;
+            gap: 8px;
         }
 
-        .modal-header h2 {
-            color: #667eea;
-            margin: 0;
+        .section-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
         }
 
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #999;
-            transition: color 0.2s;
+        .section-icon {
+            font-size: 13px;
+            flex-shrink: 0;
+            line-height: 1;
         }
 
-        .close-btn:hover {
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
             color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            letter-spacing: -0.01em;
         }
 
-        .server-info-section {
-            margin-bottom: 20px;
+        .section-badge {
+            flex-shrink: 0;
+            font-size: 11px;
+            font-weight: 500;
+            color: #888;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 1px 8px;
+            font-variant-numeric: tabular-nums;
         }
 
-        .server-info-section h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-            font-size: 1.1em;
+        /* ── Item List ── */
+        .section-content {
+            padding: 4px 0;
+            max-height: 380px;
+            overflow-y: auto;
         }
 
-        .server-info-item {
-            background: #252535;
-            padding: 10px 15px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            border-left: 3px solid #667eea;
-        }
-
-        .server-info-label {
-            color: #999;
-            font-size: 0.85em;
-            text-transform: uppercase;
-        }
-
-        .server-info-value {
-            color: #e0e0e0;
-            font-family: 'Courier New', monospace;
+        .item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 14px;
             word-break: break-all;
+            font-size: 13px;
+            color: #d4d4d4;
+            cursor: text;
+            user-select: all;
+            -webkit-user-select: all;
+            transition: background 0.1s;
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border: 2px solid #333;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-right: 8px;
+        .item:hover { background: #161616; }
+
+        .item-bar {
+            flex-shrink: 0;
+            width: 3px;
+            height: 14px;
+            border-radius: 2px;
+            align-self: center;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* Category accent bars */
+        .bar-ip   { background: #3b82f6; }
+        .bar-map  { background: #d946ef; }
+        .bar-host { background: #10b981; }
+        .bar-gm   { background: #8b5cf6; }
+        .bar-desc { background: #f59e0b; }
+        .bar-name { background: #eab308; }
+        .bar-new  { background: #06b6d4; }
+        .bar-other{ background: #6b7280; }
+
+        .item-text {
+            font-family: 'Inter', ui-monospace, 'Cascadia Code', 'Liberation Mono', monospace;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .error-message {
-            background: #ff6b6b;
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
+        .empty {
+            padding: 16px 14px;
+            color: #444;
+            font-style: italic;
+            font-size: 13px;
         }
 
-        .players-list {
-            background: #252535;
-            border-radius: 6px;
-            padding: 10px;
+        /* new-item highlight */
+        .new-item { background: rgba(6, 182, 212, 0.04); }
+        .new-item:hover { background: rgba(6, 182, 212, 0.08); }
+
+        /* ── IP link ── */
+        .clickable-ip {
+            color: #3b82f6;
+            text-decoration: none;
+            transition: color 0.15s;
         }
 
-        .player-item {
-            padding: 8px;
-            border-bottom: 1px solid #333;
-            color: #d0d0d0;
-            font-size: 0.9em;
-        }
+        .clickable-ip:hover { color: #60a5fa; }
 
-        .player-item:last-child {
-            border-bottom: none;
-        }
-
+        /* ── Footer ── */
         .footer {
-            text-align: center;
-            margin-top: 50px;
+            margin-top: 48px;
             padding-top: 20px;
-            border-top: 1px solid #333;
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .sections {
-                grid-template-columns: 1fr;
-            }
+            border-top: 1px solid #1a1a1a;
+            text-align: center;
+            color: #444;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Garry's Mod Banned Server Browser List</h1>
-        
+    <div class="page-wrapper">
+        <header class="site-header">
+            <div class="site-title">Banned Server Browser List <span>/ Garry's Mod</span></div>
+            <div class="search-wrap">
+                <span class="search-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                </span>
+                <input type="text" id="searchInput" class="search-box" placeholder="Search bans..." autocomplete="off" spellcheck="false">
+            </div>
+        </header>
+
         <div id="loading" class="loading" style="display: none;">
-            <p>Fetching banned list...</p>
+            <p>Loading ban data...</p>
         </div>
 
         <div id="content" style="display: block;">
             <div class="stats" id="stats"></div>
-            
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-box" placeholder="Search bans... (maps, gamemodes, IPs, etc)">
-            </div>
-            
             <div class="sections" id="sections"></div>
             <div class="footer">
-                Vibecode slop made with ❤️ by Redox
+                Made with ❤️ by Redox
             </div>
         </div>
 
@@ -590,99 +463,63 @@
         }
 
         function displayStats(categories) {
-            const statsHtml = `
-                <div class="stat-card">
-                    <h3>${categories.newThisWeek.length}</h3>
-                    <p>New This Week</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${categories.maps.length}</h3>
-                    <p>Banned Maps</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${categories.gamemodes.length}</h3>
-                    <p>Banned Gamemodes</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${categories.hosts.length}</h3>
-                    <p>Banned Hosts</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${categories.ips.length}</h3>
-                    <p>Banned IPs/Networks</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${categories.descriptions.length}</h3>
-                    <p>Banned Descriptions</p>
-                </div>
-                <div class="stat-card">
-                    <h3>${categories.other.length}</h3>
-                    <p>Other Bans</p>
-                </div>
-            `;
-            document.getElementById('stats').innerHTML = statsHtml;
+            const mk = (num, label) =>
+                `<div class="stat-card"><div class="stat-num">${num}</div><div class="stat-label">${label}</div></div>`;
+            document.getElementById('stats').innerHTML =
+                mk(categories.newThisWeek.length, 'New This Week') +
+                mk(categories.ips.length,         'Banned IPs/Networks') +
+                mk(categories.maps.length,         'Banned Maps') +
+                mk(categories.hosts.length,        'Banned Hosts') +
+                mk(categories.gamemodes.length,    'Banned Gamemodes') +
+                mk(categories.descriptions.length, 'Banned Descriptions') +
+                mk(categories.names.length,        'Banned Names');
         }
 
-        function displaySections(categories, newBans = []) {
+        function displaySections(categories) {
             let html = '';
-
-            if (categories.newThisWeek.length > 0) {
-                html += createSection('⭐ New This Week', categories.newThisWeek, 'new-tag', true);
-            }
-
-            if (categories.ips.length > 0) {
-                html += createSection('🌐 Banned IPs/Networks', categories.ips, 'ip-tag');
-            }
-
-            if (categories.maps.length > 0) {
-                html += createSection('🗺️ Banned Maps', categories.maps, 'map-tag');
-            }
-
-            if (categories.hosts.length > 0) {
-                html += createSection('🖥️ Banned Hosts', categories.hosts, 'host-tag');
-            }
-
-            if (categories.gamemodes.length > 0) {
-                html += createSection('🎮 Banned Gamemodes', categories.gamemodes, 'gm-tag');
-            }
-
-            if (categories.descriptions.length > 0) {
-                html += createSection('📝 Banned Descriptions', categories.descriptions, 'desc-tag');
-            }
-
-            if (categories.names.length > 0) {
-                html += createSection('🏷️ Banned Names', categories.names, 'name-tag');
-            }
-
-            if (categories.other.length > 0) {
-                html += createSection('❓ Other Bans', categories.other, '');
-            }
-
+            if (categories.newThisWeek.length > 0)
+                html += createSection('New This Week',      '✦', categories.newThisWeek, 'bar-new',   true);
+            if (categories.ips.length > 0)
+                html += createSection('Banned IPs/Networks','⊕', categories.ips,         'bar-ip');
+            if (categories.maps.length > 0)
+                html += createSection('Banned Maps',        '◈', categories.maps,        'bar-map');
+            if (categories.hosts.length > 0)
+                html += createSection('Banned Hosts',       '⊞', categories.hosts,       'bar-host');
+            if (categories.gamemodes.length > 0)
+                html += createSection('Banned Gamemodes',   '◉', categories.gamemodes,   'bar-gm');
+            if (categories.descriptions.length > 0)
+                html += createSection('Banned Descriptions','◧', categories.descriptions,'bar-desc');
+            if (categories.names.length > 0)
+                html += createSection('Banned Names',       '◆', categories.names,       'bar-name');
+            if (categories.other.length > 0)
+                html += createSection('Other Bans',         '◌', categories.other,       'bar-other');
             document.getElementById('sections').innerHTML = html;
         }
 
-        function createSection(title, items, tagClass, isNew = false) {
+        function createSection(title, icon, items, barClass, isNew = false) {
+            const ipWithPortRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/;
             const itemsHtml = items.map(item => {
-                // Check if item is an IP with a port
-                const ipWithPortRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/;
+                const itemClass = 'item' + (isNew ? ' new-item' : '');
+                const bar = `<span class="item-bar ${barClass}"></span>`;
                 if (ipWithPortRegex.test(item)) {
                     const encodedIp = encodeURIComponent(item);
-                    return `<div class="item ${isNew ? 'new-item' : ''}"><span class="item-label ${tagClass}">•</span><a href="https://sourcequery.yepoleb.at/query?server=${encodedIp}" target="_blank" class="clickable-ip">${item}</a></div>`;
+                    return `<div class="${itemClass}">${bar}<span class="item-text"><a href="https://sourcequery.yepoleb.at/query?server=${encodedIp}" target="_blank" rel="noopener noreferrer" class="clickable-ip">${item}</a></span></div>`;
                 }
-                return `<div class="item ${isNew ? 'new-item' : ''}"><span class="item-label ${tagClass}">•</span>${item}</div>`;
+                return `<div class="${itemClass}">${bar}<span class="item-text">${item}</span></div>`;
             }).join('');
 
-            return `
-                <div class="section ${isNew ? 'section-new' : ''}">
-                    <div class="section-header">
-                        <span>${title}</span>
-                        <span class="section-count">${items.length}</span>
+            return `<div class="section${isNew ? ' section-new' : ''}">
+                <div class="section-header">
+                    <div class="section-header-left">
+                        <span class="section-icon">${icon}</span>
+                        <span class="section-title">${title}</span>
                     </div>
-                    <div class="section-content">
-                        ${itemsHtml || '<div class="empty">No items</div>'}
-                    </div>
+                    <span class="section-badge">${items.length}</span>
                 </div>
-            `;
+                <div class="section-content">
+                    ${itemsHtml || '<div class="empty">No items</div>'}
+                </div>
+            </div>`;
         }
 
         // Initialize on page load
