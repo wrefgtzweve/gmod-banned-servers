@@ -504,7 +504,7 @@
                 const bar = `<span class="item-bar ${barClass}"></span>`;
                 if (ipWithPortRegex.test(item)) {
                     const encodedIp = encodeURIComponent(item);
-                    return `<div class="${itemClass}">${bar}<span class="item-text"><a href="https://sourcequery.yepoleb.at/query?server=${encodedIp}" target="_blank" rel="noopener noreferrer" class="clickable-ip">${item}</a></span></div>`;
+                    return `<div class="${itemClass}">${bar}<span class="item-text"><a href="https://a2s.zmod.gg/server?ip=${encodedIp}" target="_blank" rel="noopener noreferrer" class="clickable-ip">${item}</a></span></div>`;
                 }
                 return `<div class="${itemClass}">${bar}<span class="item-text">${item}</span></div>`;
             }).join('');
