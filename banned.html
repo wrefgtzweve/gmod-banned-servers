@@ -191,7 +191,8 @@
             flex-direction: column;
         }
 
-        .section-new {
+        .section-new,
+        .section-removed {
             border-color: #2a2a2a;
         }
 
@@ -226,11 +227,12 @@
         /* Category icon colors */
         .icon-ip   { color: #3b82f6; }
         .icon-map  { color: #d946ef; }
-        .icon-host { color: #10b981; }
+        .icon-host { color: #06b6d4; }
         .icon-gm   { color: #8b5cf6; }
         .icon-desc { color: #f59e0b; }
         .icon-name { color: #eab308; }
-        .icon-new  { color: #06b6d4; }
+        .icon-new  { color: #10b981; }
+        .icon-removed { color: #f43f5e; }
         .icon-other{ color: #6b7280; }
 
         .section-title {
@@ -289,11 +291,12 @@
         /* Category accent bars */
         .bar-ip   { background: #3b82f6; }
         .bar-map  { background: #d946ef; }
-        .bar-host { background: #10b981; }
+        .bar-host { background: #06b6d4; }
         .bar-gm   { background: #8b5cf6; }
         .bar-desc { background: #f59e0b; }
         .bar-name { background: #eab308; }
-        .bar-new  { background: #06b6d4; }
+        .bar-new  { background: #10b981; }
+        .bar-removed { background: #f43f5e; }
         .bar-other{ background: #6b7280; }
 
         .item-text {
@@ -311,8 +314,12 @@
         }
 
         /* new-item highlight */
-        .new-item { background: rgba(6, 182, 212, 0.04); }
-        .new-item:hover { background: rgba(6, 182, 212, 0.08); }
+        .new-item { background: rgba(16, 185, 129, 0.04); }
+        .new-item:hover { background: rgba(16, 185, 129, 0.08); }
+
+        /* removed-item highlight */
+        .removed-item { background: rgba(244, 63, 94, 0.04); }
+        .removed-item:hover { background: rgba(244, 63, 94, 0.08); }
 
         /* ── Timestamp badge ── */
         .item-time {
@@ -327,7 +334,8 @@
             user-select: none;
         }
 
-        .new-item .item-time { color: #0e7490; }
+        .new-item .item-time { color: #047857; }
+        .removed-item .item-time { color: #be123c; }
 
         /* ── IP link ── */
         .clickable-ip {
@@ -347,6 +355,14 @@
             color: #444;
             font-size: 12px;
         }
+
+        .footer a {
+            color: #888;
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+
+        .footer a:hover { color: #fff; }
     </style>
 </head>
 <body>
@@ -368,12 +384,13 @@
         <div id="content" style="display: block;">
             <div class="stats" id="stats"></div>
             <div class="sections" id="sections"></div>
-            <div class="footer">
-                Vibecoded slop made with ❤️ by Redox
-            </div>
         </div>
 
         <div id="error" style="display: none;" class="error"></div>
+
+        <footer class="footer">
+            Vibecoded slop made with ❤️ by <a href="https://redox.to" target="_blank" rel="noopener noreferrer">Redox</a>
+        </footer>
     </div>
 
     <!-- DATA_INJECTION_POINT -->
@@ -384,6 +401,8 @@
         let originalBanned = null;
         let newBansSet = new Set();
         let newTimestamps = new Map();
+        let removedBansSet = new Set();
+        let removedTimestamps = new Map();
 
         const relativeTimeFormatter = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
         const RELATIVE_TIME_DIVISIONS = [
@@ -421,30 +440,41 @@
             return `<time class="item-time" datetime="${new Date(ts).toISOString()}" data-ts="${ts}" title="${escapeHtml(formatAbsoluteTime(ts))}">${escapeHtml(formatRelativeTime(ts))}</time>`;
         }
 
+        function parseTimestampedEntries(list) {
+            const set = new Set();
+            const timestamps = new Map();
+            (list || []).forEach(entry => {
+                const value = typeof entry === 'string' ? { entry } : entry;
+                if (!value || value.entry == null) return;
+                set.add(value.entry);
+                if (typeof value.timestamp === 'number' && !Number.isNaN(value.timestamp)) {
+                    timestamps.set(value.entry, value.timestamp);
+                }
+            });
+            return { set, timestamps };
+        }
+
         function initializeFromData() {
             try {
                 if (!window.__BAN_DATA__) {
                     throw new Error('No ban data found');
                 }
-                
+
                 const data = window.__BAN_DATA__;
-                
+
                 if (!data.banned) {
                     throw new Error('No banned data found in response');
                 }
 
                 originalBanned = data.banned;
-                newBansSet = new Set();
-                newTimestamps = new Map();
-                (data.new || []).forEach(entry => {
-                    const value = typeof entry === 'string' ? { entry } : entry;
-                    if (!value || value.entry == null) return;
-                    newBansSet.add(value.entry);
-                    if (typeof value.timestamp === 'number' && !Number.isNaN(value.timestamp)) {
-                        newTimestamps.set(value.entry, value.timestamp);
-                    }
-                });
+                const parsedNew = parseTimestampedEntries(data.new);
+                newBansSet = parsedNew.set;
+                newTimestamps = parsedNew.timestamps;
+                const parsedRemoved = parseTimestampedEntries(data.removed);
+                removedBansSet = parsedRemoved.set;
+                removedTimestamps = parsedRemoved.timestamps;
                 allCategories = categorizeBanned(originalBanned, Array.from(newBansSet));
+                allCategories.removedThisMonth = Array.from(removedBansSet).sort();
                 
                 displayStats(allCategories);
                 displaySections(allCategories);
@@ -491,7 +521,8 @@
 
         function categorizeBanned(banned, newBans = []) {
             const categories = {
-                newThisWeek: [],
+                newThisMonth: [],
+                removedThisMonth: [],
                 maps: [],
                 gamemodes: [],
                 hosts: [],
@@ -505,7 +536,7 @@
 
             banned.forEach(item => {
                 if (newBansSet.has(item)) {
-                    categories.newThisWeek.push(item);
+                    categories.newThisMonth.push(item);
                 } else if (item.startsWith('map:')) {
                     categories.maps.push(item.substring(4));
                 } else if (item.startsWith('gm:')) {
@@ -545,10 +576,11 @@
             const mk = (num, label) =>
                 `<div class="stat-card"><div class="stat-num">${num}</div><div class="stat-label">${label}</div></div>`;
             document.getElementById('stats').innerHTML =
-                mk(categories.newThisWeek.length, 'New This Week') +
+                mk(categories.newThisMonth.length, 'New This Month') +
+                mk(categories.removedThisMonth.length, 'Removed This Month') +
                 mk(categories.ips.length,         'Banned IPs/Networks') +
                 mk(categories.maps.length,         'Banned Maps') +
-                mk(categories.hosts.length,        'Banned Hosts') +
+                mk(categories.hosts.length,        'Banned Hostnames') +
                 mk(categories.gamemodes.length,    'Banned Gamemodes') +
                 mk(categories.descriptions.length, 'Banned Descriptions') +
                 mk(categories.names.length,        'Banned Names');
@@ -556,14 +588,16 @@
 
         function displaySections(categories) {
             let html = '';
-            if (categories.newThisWeek.length > 0)
-                html += createSection('New This Week',      'sparkles', categories.newThisWeek, 'bar-new',   true, newTimestamps);
+            if (categories.newThisMonth.length > 0)
+                html += createSection('New This Month',     'sparkles', categories.newThisMonth, 'bar-new',      'new', newTimestamps);
+            if (categories.removedThisMonth.length > 0)
+                html += createSection('Removed This Month', 'trash-2',  categories.removedThisMonth, 'bar-removed', 'removed', removedTimestamps);
             if (categories.ips.length > 0)
                 html += createSection('Banned IPs/Networks','network', categories.ips,         'bar-ip');
             if (categories.maps.length > 0)
                 html += createSection('Banned Maps',        'map', categories.maps,        'bar-map');
             if (categories.hosts.length > 0)
-                html += createSection('Banned Hosts',       'server', categories.hosts,       'bar-host');
+                html += createSection('Banned Hostnames',   'server', categories.hosts,       'bar-host');
             if (categories.gamemodes.length > 0)
                 html += createSection('Banned Gamemodes',   'gamepad-2', categories.gamemodes,   'bar-gm');
             if (categories.descriptions.length > 0)
@@ -576,11 +610,11 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        function createSection(title, icon, items, barClass, isNew = false, timestamps = null) {
+        function createSection(title, icon, items, barClass, highlight = null, timestamps = null) {
             const iconClass = barClass.replace('bar-', 'icon-');
             const ipWithPortRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/;
             const itemsHtml = items.map(item => {
-                const itemClass = 'item' + (isNew ? ' new-item' : '');
+                const itemClass = 'item' + (highlight ? ` ${highlight}-item` : '');
                 const bar = `<span class="item-bar ${barClass}"></span>`;
                 const timeHtml = renderTimestampHtml(timestamps, item);
                 if (ipWithPortRegex.test(item)) {
@@ -590,7 +624,7 @@
                 return `<div class="${itemClass}">${bar}<span class="item-text">${item}</span>${timeHtml}</div>`;
             }).join('');
 
-            return `<div class="section${isNew ? ' section-new' : ''}">
+            return `<div class="section${highlight ? ` section-${highlight}` : ''}">
                 <div class="section-header">
                     <div class="section-header-left">
                         <span class="section-icon ${iconClass}"><i data-lucide="${icon}"></i></span>
