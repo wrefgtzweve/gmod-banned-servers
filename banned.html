@@ -599,7 +599,7 @@
             if (categories.gamemodes.length > 0)
                 html += createSection('Banned Gamemodes',   'gamepad-2', categories.gamemodes,   'bar-gm');
             if (categories.descriptions.length > 0)
-                html += createSection('Banned Descriptions','file-text', categories.descriptions,'bar-desc', null, null, 'The nice display names of banned gamemodes');
+                html += createSection('Banned Descriptions','file-text', categories.descriptions,'bar-desc', null, null, 'The nice display names of gamemodes');
             if (categories.other.length > 0)
                 html += createSection('Other Bans',         'circle', categories.other,       'bar-other');
             document.getElementById('sections').innerHTML = html;
