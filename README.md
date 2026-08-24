@@ -1,4 +1,4 @@
-# Vibecode - Facepunch Banned List Tracker
+# bannedgmodservers - Facepunch Banned List Tracker
 
 A real-time dashboard displaying banned items from Facepunch's public API, with caching and change tracking.
 
@@ -34,8 +34,8 @@ Visit `http://localhost:3000` in your browser.
 **Build and run with Docker:**
 
 ```bash
-docker build -t vibecode .
-docker run -p 3000:3000 vibecode
+docker build -t bannedgmodservers .
+docker run -p 3000:3000 bannedgmodservers
 ```
 
 **Using Docker Compose:**

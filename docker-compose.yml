@@ -1,9 +1,9 @@
 services:
-  vibecode:
+  bannedgmodservers:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vibecode-app
+    container_name: bannedgmodservers
     ports:
       - "3000:3000"
     volumes:
