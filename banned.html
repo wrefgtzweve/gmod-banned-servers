@@ -30,6 +30,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         /* ── Reset & Base ── */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -211,10 +212,26 @@
         }
 
         .section-icon {
-            font-size: 13px;
             flex-shrink: 0;
             line-height: 1;
+            display: flex;
+            align-items: center;
         }
+
+        .section-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Category icon colors */
+        .icon-ip   { color: #3b82f6; }
+        .icon-map  { color: #d946ef; }
+        .icon-host { color: #10b981; }
+        .icon-gm   { color: #8b5cf6; }
+        .icon-desc { color: #f59e0b; }
+        .icon-name { color: #eab308; }
+        .icon-new  { color: #06b6d4; }
+        .icon-other{ color: #6b7280; }
 
         .section-title {
             font-size: 13px;
@@ -479,25 +496,27 @@
         function displaySections(categories) {
             let html = '';
             if (categories.newThisWeek.length > 0)
-                html += createSection('New This Week',      '✦', categories.newThisWeek, 'bar-new',   true);
+                html += createSection('New This Week',      'sparkles', categories.newThisWeek, 'bar-new',   true);
             if (categories.ips.length > 0)
-                html += createSection('Banned IPs/Networks','⊕', categories.ips,         'bar-ip');
+                html += createSection('Banned IPs/Networks','network', categories.ips,         'bar-ip');
             if (categories.maps.length > 0)
-                html += createSection('Banned Maps',        '◈', categories.maps,        'bar-map');
+                html += createSection('Banned Maps',        'map', categories.maps,        'bar-map');
             if (categories.hosts.length > 0)
-                html += createSection('Banned Hosts',       '⊞', categories.hosts,       'bar-host');
+                html += createSection('Banned Hosts',       'server', categories.hosts,       'bar-host');
             if (categories.gamemodes.length > 0)
-                html += createSection('Banned Gamemodes',   '◉', categories.gamemodes,   'bar-gm');
+                html += createSection('Banned Gamemodes',   'gamepad-2', categories.gamemodes,   'bar-gm');
             if (categories.descriptions.length > 0)
-                html += createSection('Banned Descriptions','◧', categories.descriptions,'bar-desc');
+                html += createSection('Banned Descriptions','file-text', categories.descriptions,'bar-desc');
             if (categories.names.length > 0)
-                html += createSection('Banned Names',       '◆', categories.names,       'bar-name');
+                html += createSection('Banned Names',       'tag', categories.names,        'bar-name');
             if (categories.other.length > 0)
-                html += createSection('Other Bans',         '◌', categories.other,       'bar-other');
+                html += createSection('Other Bans',         'circle', categories.other,       'bar-other');
             document.getElementById('sections').innerHTML = html;
+            if (window.lucide) lucide.createIcons();
         }
 
         function createSection(title, icon, items, barClass, isNew = false) {
+            const iconClass = barClass.replace('bar-', 'icon-');
             const ipWithPortRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/;
             const itemsHtml = items.map(item => {
                 const itemClass = 'item' + (isNew ? ' new-item' : '');
@@ -512,7 +531,7 @@
             return `<div class="section${isNew ? ' section-new' : ''}">
                 <div class="section-header">
                     <div class="section-header-left">
-                        <span class="section-icon">${icon}</span>
+                        <span class="section-icon ${iconClass}"><i data-lucide="${icon}"></i></span>
                         <span class="section-title">${title}</span>
                     </div>
                     <span class="section-badge">${items.length}</span>
