@@ -566,8 +566,8 @@
         }
 
         function displayStats(categories) {
-            const mk = (num, label) =>
-                `<div class="stat-card"><div class="stat-num">${num}</div><div class="stat-label">${label}</div></div>`;
+            const mk = (num, label, tooltip) =>
+                `<div class="stat-card"${tooltip ? ` title="${escapeHtml(tooltip)}"` : ''}><div class="stat-num">${num}</div><div class="stat-label">${label}</div></div>`;
             document.getElementById('stats').innerHTML =
                 mk(categories.newThisMonth.length, 'New This Month') +
                 mk(categories.removedThisMonth.length, 'Removed This Month') +
@@ -575,7 +575,7 @@
                 mk(categories.maps.length,         'Banned Maps') +
                 mk(categories.hostnames.length,    'Banned Hostnames') +
                 mk(categories.gamemodes.length,    'Banned Gamemodes') +
-                mk(categories.descriptions.length, 'Banned Descriptions');
+                mk(categories.descriptions.length, 'Banned Descriptions', 'The nice display names of gamemodes');
         }
 
         function displaySections(categories) {
@@ -593,14 +593,14 @@
             if (categories.gamemodes.length > 0)
                 html += createSection('Banned Gamemodes',   'gamepad-2', categories.gamemodes,   'bar-gm');
             if (categories.descriptions.length > 0)
-                html += createSection('Banned Descriptions','file-text', categories.descriptions,'bar-desc');
+                html += createSection('Banned Descriptions','file-text', categories.descriptions,'bar-desc', null, null, 'The nice display names of banned gamemodes');
             if (categories.other.length > 0)
                 html += createSection('Other Bans',         'circle', categories.other,       'bar-other');
             document.getElementById('sections').innerHTML = html;
             if (window.lucide) lucide.createIcons();
         }
 
-        function createSection(title, icon, items, barClass, highlight = null, timestamps = null) {
+        function createSection(title, icon, items, barClass, highlight = null, timestamps = null, tooltip = null) {
             const iconClass = barClass.replace('bar-', 'icon-');
             const ipWithPortRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/;
             const itemsHtml = items.map(item => {
@@ -618,7 +618,7 @@
                 <div class="section-header">
                     <div class="section-header-left">
                         <span class="section-icon ${iconClass}"><i data-lucide="${icon}"></i></span>
-                        <span class="section-title">${title}</span>
+                        <span class="section-title"${tooltip ? ` title="${escapeHtml(tooltip)}" style="cursor: help;"` : ''}>${title}</span>
                     </div>
                     <span class="section-badge">${items.length}</span>
                 </div>
