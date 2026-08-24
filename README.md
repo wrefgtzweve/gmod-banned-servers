@@ -4,7 +4,7 @@ A real-time dashboard displaying banned items from Facepunch's public API, with 
 
 ## Features
 
-- **Live Ban List** - Displays all banned maps, gamemodes, IPs, hosts, and descriptions
+- **Live Ban List** - Displays all banned maps, gamemodes, IPs, hostnames, and descriptions
 - **Change Tracking** - Shows items banned in the last 7 days
 - **Search & Filter** - Real-time search across all categories
 - **SQLite Caching** - Efficient caching with SQLite database

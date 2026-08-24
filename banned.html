@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Garry's Mod Banned List - Server Bans</title>
-    <meta name="description" content="View the complete Garry's Mod banned list. Search and filter banned maps, gamemodes, IPs, hosts, and more. Stay updated with new bans.">
+    <meta name="description" content="View the complete Garry's Mod banned list. Search and filter banned maps, gamemodes, IPs, hostnames, and more. Stay updated with new bans.">
     <meta name="keywords" content="Garry's Mod, banned, servers, maps, gamemodes, blacklist">
     <meta name="theme-color" content="#000000">
 
@@ -230,7 +230,6 @@
         .icon-host { color: #06b6d4; }
         .icon-gm   { color: #8b5cf6; }
         .icon-desc { color: #f59e0b; }
-        .icon-name { color: #eab308; }
         .icon-new  { color: #10b981; }
         .icon-removed { color: #f43f5e; }
         .icon-other{ color: #6b7280; }
@@ -294,7 +293,6 @@
         .bar-host { background: #06b6d4; }
         .bar-gm   { background: #8b5cf6; }
         .bar-desc { background: #f59e0b; }
-        .bar-name { background: #eab308; }
         .bar-new  { background: #10b981; }
         .bar-removed { background: #f43f5e; }
         .bar-other{ background: #6b7280; }
@@ -525,10 +523,9 @@
                 removedThisMonth: [],
                 maps: [],
                 gamemodes: [],
-                hosts: [],
+                hostnames: [],
                 ips: [],
                 descriptions: [],
-                names: [],
                 other: []
             };
 
@@ -541,14 +538,10 @@
                     categories.maps.push(item.substring(4));
                 } else if (item.startsWith('gm:')) {
                     categories.gamemodes.push(item.substring(3));
-                } else if (item.startsWith('host:')) {
-                    categories.hosts.push(item.substring(5));
+                } else if (item.startsWith('host:') || item.startsWith('name:') || item.startsWith('hos2t:')) {
+                    categories.hostnames.push(item.substring(item.indexOf(':') + 1));
                 } else if (item.startsWith('desc:')) {
                     categories.descriptions.push(item.substring(5));
-                } else if (item.startsWith('name:')) {
-                    categories.names.push(item.substring(5));
-                } else if (item.startsWith('hos2t:')) {
-                    categories.hosts.push(item.substring(6));
                 } else if (item.includes('/')) {
                     categories.ips.push(item);
                 } else if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(item)) {
@@ -580,10 +573,9 @@
                 mk(categories.removedThisMonth.length, 'Removed This Month') +
                 mk(categories.ips.length,         'Banned IPs/Networks') +
                 mk(categories.maps.length,         'Banned Maps') +
-                mk(categories.hosts.length,        'Banned Hostnames') +
+                mk(categories.hostnames.length,    'Banned Hostnames') +
                 mk(categories.gamemodes.length,    'Banned Gamemodes') +
-                mk(categories.descriptions.length, 'Banned Descriptions') +
-                mk(categories.names.length,        'Banned Names');
+                mk(categories.descriptions.length, 'Banned Descriptions');
         }
 
         function displaySections(categories) {
@@ -596,14 +588,12 @@
                 html += createSection('Banned IPs/Networks','network', categories.ips,         'bar-ip');
             if (categories.maps.length > 0)
                 html += createSection('Banned Maps',        'map', categories.maps,        'bar-map');
-            if (categories.hosts.length > 0)
-                html += createSection('Banned Hostnames',   'server', categories.hosts,       'bar-host');
+            if (categories.hostnames.length > 0)
+                html += createSection('Banned Hostnames',   'server', categories.hostnames,   'bar-host');
             if (categories.gamemodes.length > 0)
                 html += createSection('Banned Gamemodes',   'gamepad-2', categories.gamemodes,   'bar-gm');
             if (categories.descriptions.length > 0)
                 html += createSection('Banned Descriptions','file-text', categories.descriptions,'bar-desc');
-            if (categories.names.length > 0)
-                html += createSection('Banned Names',       'tag', categories.names,        'bar-name');
             if (categories.other.length > 0)
                 html += createSection('Other Bans',         'circle', categories.other,       'bar-other');
             document.getElementById('sections').innerHTML = html;
