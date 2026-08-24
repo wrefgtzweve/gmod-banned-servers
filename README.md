@@ -41,7 +41,7 @@ docker run -p 3000:3000 bannedgmodservers
 **Using Docker Compose:**
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 The application will be available at `http://localhost:3000`.
