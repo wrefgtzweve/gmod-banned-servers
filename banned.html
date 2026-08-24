@@ -314,6 +314,21 @@
         .new-item { background: rgba(6, 182, 212, 0.04); }
         .new-item:hover { background: rgba(6, 182, 212, 0.08); }
 
+        /* ── Timestamp badge ── */
+        .item-time {
+            flex-shrink: 0;
+            margin-left: auto;
+            padding-left: 10px;
+            font-size: 11px;
+            color: #666;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            cursor: default;
+            user-select: none;
+        }
+
+        .new-item .item-time { color: #0e7490; }
+
         /* ── IP link ── */
         .clickable-ip {
             color: #3b82f6;
@@ -368,6 +383,43 @@
         let allCategories = null;
         let originalBanned = null;
         let newBansSet = new Set();
+        let newTimestamps = new Map();
+
+        const relativeTimeFormatter = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
+        const RELATIVE_TIME_DIVISIONS = [
+            { amount: 60, unit: 'second' },
+            { amount: 60, unit: 'minute' },
+            { amount: 24, unit: 'hour' },
+            { amount: 7, unit: 'day' },
+            { amount: 4.34524, unit: 'week' },
+            { amount: 12, unit: 'month' },
+            { amount: Number.POSITIVE_INFINITY, unit: 'year' }
+        ];
+
+        function formatRelativeTime(timestampMs) {
+            let duration = (timestampMs - Date.now()) / 1000;
+            for (const division of RELATIVE_TIME_DIVISIONS) {
+                if (Math.abs(duration) < division.amount) {
+                    return relativeTimeFormatter.format(Math.round(duration), division.unit);
+                }
+                duration /= division.amount;
+            }
+        }
+
+        function formatAbsoluteTime(timestampMs) {
+            return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(timestampMs));
+        }
+
+        function escapeHtml(text) {
+            return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function renderTimestampHtml(timestamps, item) {
+            if (!timestamps) return '';
+            const ts = timestamps.get(item);
+            if (typeof ts !== 'number' || Number.isNaN(ts)) return '';
+            return `<time class="item-time" datetime="${new Date(ts).toISOString()}" data-ts="${ts}" title="${escapeHtml(formatAbsoluteTime(ts))}">${escapeHtml(formatRelativeTime(ts))}</time>`;
+        }
 
         function initializeFromData() {
             try {
@@ -382,7 +434,16 @@
                 }
 
                 originalBanned = data.banned;
-                newBansSet = new Set(data.new || []);
+                newBansSet = new Set();
+                newTimestamps = new Map();
+                (data.new || []).forEach(entry => {
+                    const value = typeof entry === 'string' ? { entry } : entry;
+                    if (!value || value.entry == null) return;
+                    newBansSet.add(value.entry);
+                    if (typeof value.timestamp === 'number' && !Number.isNaN(value.timestamp)) {
+                        newTimestamps.set(value.entry, value.timestamp);
+                    }
+                });
                 allCategories = categorizeBanned(originalBanned, Array.from(newBansSet));
                 
                 displayStats(allCategories);
@@ -496,7 +557,7 @@
         function displaySections(categories) {
             let html = '';
             if (categories.newThisWeek.length > 0)
-                html += createSection('New This Week',      'sparkles', categories.newThisWeek, 'bar-new',   true);
+                html += createSection('New This Week',      'sparkles', categories.newThisWeek, 'bar-new',   true, newTimestamps);
             if (categories.ips.length > 0)
                 html += createSection('Banned IPs/Networks','network', categories.ips,         'bar-ip');
             if (categories.maps.length > 0)
@@ -515,17 +576,18 @@
             if (window.lucide) lucide.createIcons();
         }
 
-        function createSection(title, icon, items, barClass, isNew = false) {
+        function createSection(title, icon, items, barClass, isNew = false, timestamps = null) {
             const iconClass = barClass.replace('bar-', 'icon-');
             const ipWithPortRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d+$/;
             const itemsHtml = items.map(item => {
                 const itemClass = 'item' + (isNew ? ' new-item' : '');
                 const bar = `<span class="item-bar ${barClass}"></span>`;
+                const timeHtml = renderTimestampHtml(timestamps, item);
                 if (ipWithPortRegex.test(item)) {
                     const encodedIp = encodeURIComponent(item);
-                    return `<div class="${itemClass}">${bar}<span class="item-text"><a href="https://a2s.zmod.gg/server?ip=${encodedIp}" target="_blank" rel="noopener noreferrer" class="clickable-ip">${item}</a></span></div>`;
+                    return `<div class="${itemClass}">${bar}<span class="item-text"><a href="https://a2s.zmod.gg/server?ip=${encodedIp}" target="_blank" rel="noopener noreferrer" class="clickable-ip">${item}</a></span>${timeHtml}</div>`;
                 }
-                return `<div class="${itemClass}">${bar}<span class="item-text">${item}</span></div>`;
+                return `<div class="${itemClass}">${bar}<span class="item-text">${item}</span>${timeHtml}</div>`;
             }).join('');
 
             return `<div class="section${isNew ? ' section-new' : ''}">
@@ -541,6 +603,12 @@
                 </div>
             </div>`;
         }
+
+        setInterval(() => {
+            document.querySelectorAll('.item-time[data-ts]').forEach(el => {
+                el.textContent = formatRelativeTime(Number(el.getAttribute('data-ts')));
+            });
+        }, 60 * 1000);
 
         // Initialize on page load
         initializeFromData();

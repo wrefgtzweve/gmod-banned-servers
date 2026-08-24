@@ -108,7 +108,7 @@ async function backgroundFetch() {
         
         const banData = {
             banned: currentBanned,
-            new: Object.keys(newEntries),
+            new: Object.entries(newEntries).map(([entry, timestamp]) => ({ entry, timestamp })),
             cacheTimestamp: Object.keys(oldCache).length > 0 ? Math.min(...Object.values(oldCache)) : 0,
             fetchTimestamp: now
         };
