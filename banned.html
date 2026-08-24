@@ -452,6 +452,10 @@
             return { set, timestamps };
         }
 
+        function sortByTimestampDesc(items, timestamps) {
+            items.sort((a, b) => (timestamps.get(b) ?? 0) - (timestamps.get(a) ?? 0));
+        }
+
         function initializeFromData() {
             try {
                 if (!window.__BAN_DATA__) {
@@ -472,7 +476,9 @@
                 removedBansSet = parsedRemoved.set;
                 removedTimestamps = parsedRemoved.timestamps;
                 allCategories = categorizeBanned(originalBanned, Array.from(newBansSet));
-                allCategories.removedThisMonth = Array.from(removedBansSet).sort();
+                allCategories.removedThisMonth = Array.from(removedBansSet);
+                sortByTimestampDesc(allCategories.newThisMonth, newTimestamps);
+                sortByTimestampDesc(allCategories.removedThisMonth, removedTimestamps);
                 
                 displayStats(allCategories);
                 displaySections(allCategories);
